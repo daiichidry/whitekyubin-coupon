@@ -7,4 +7,4 @@ function api(p,ok,ng){const cb='cb'+Date.now()+'_'+(++seq),s=document.createElem
 function show(a){a=Number(a);big.textContent=a;amount.textContent=a;let u=Math.floor((500-a)/100),h='';for(let i=0;i<5;i++)h+=i<u?'<div class="box used"><span class="label">'+(i+1)+'回目</span></div>':'<div class="box">□<span class="label">'+(i+1)+'回目</span></div>';stamps.innerHTML=h;btn.disabled=a<=0;btn.textContent=a<=0?'クーポン使用済み':'100円分を使用する'}
 function load(){api({action:'get',id:localStorage.getItem(KEY)||''},r=>{if(!r.ok)throw 0;if(r.newCustomer)localStorage.setItem(KEY,r.id);show(r.amount);load.style.display='none';coupon.style.display='block'},()=>load.textContent='読み込みに失敗しました。ページを再読み込みしてください。')}
 function use(){const id=localStorage.getItem(KEY);if(!id||!confirm('100円分を使用しますか？'))return;btn.disabled=true;api({action:'use',id:id},r=>{if(!r.ok)throw 0;show(r.amount);msg.textContent='100円分を使用しました。'},()=>{btn.disabled=false;msg.textContent='処理に失敗しました。'})}load();
-</script></body></html>
+load();/script></body></html>
