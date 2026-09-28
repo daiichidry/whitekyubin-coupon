@@ -86,7 +86,7 @@ body{min-height:100vh}
       <span id="issuedLabel">発行日 -</span>
       <span id="couponId">クーポンID -</span>
     </div>
-    <div id="expiryCountdown" style="text-align:center;margin:8px 0 10px;font-weight:800;color:#D81B60;font-size:13px;">有効期限まであと—日</div>
+    <div id="expiryCountdown" style="text-align:center;margin:8px 0 10px;font-weight:900;color:#D81B60;font-size:24px;line-height:1.4;">有効期限まであと—日</div>
     <div class="history">
       <div class="history-title">利用履歴</div>
       <div class="history-list" id="historyList"></div>
@@ -212,16 +212,22 @@ body{min-height:100vh}
   }
 
   function updateExpiryCountdown() {
-    var parts = String(state.issued).split("/");
-    if (parts.length !== 3) {
+    var issuedText = String(state.issued || "").trim();
+    var match = issuedText.match(/^(\d{4})[\/\-年](\d{1,2})[\/\-月](\d{1,2})日?$/);
+    var issuedDate;
+    if (match) {
+      issuedDate = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+    } else {
+      issuedDate = new Date(issuedText);
+    }
+    if (isNaN(issuedDate.getTime())) {
       expiryCountdownEl.textContent = "有効期限まであと—日";
       return;
     }
-    var issuedDate = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
     var expiryDate = new Date(issuedDate.getFullYear() + 1, issuedDate.getMonth(), issuedDate.getDate());
     var today = new Date();
     var todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    var remaining = Math.max(0, Math.ceil((expiryDate - todayDate) / 86400000));
+    var remaining = Math.max(0, Math.ceil((expiryDate.getTime() - todayDate.getTime()) / 86400000));
     expiryCountdownEl.textContent = "有効期限まであと" + remaining + "日";
   }
 
