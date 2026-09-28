@@ -86,7 +86,7 @@ body{min-height:100vh}
       <span id="issuedLabel">発行日 -</span>
       <span id="couponId">クーポンID -</span>
     </div>
-    <div id="expiryCountdown" style="text-align:center;margin:8px 0 10px;font-weight:800;color:#D81B60;font-size:18px;">有効期限まであと—日</div>
+    <div id="expiryCountdown" style="display:block;width:100%;box-sizing:border-box;text-align:center;margin:12px 0 14px;padding:10px 6px;font-weight:900;color:#D81B60;font-size:24px;line-height:1.3;background:#fff5f8;border-radius:12px;visibility:visible;opacity:1;">有効期限まであと365日</div>
     <div class="history">
       <div class="history-title">利用履歴</div>
       <div class="history-list" id="historyList"></div>
@@ -212,22 +212,22 @@ body{min-height:100vh}
   }
 
   function updateExpiryCountdown() {
-    // 発行日の表記ゆれ（YYYY/MM/DD、YYYY-MM-DD、YYYY年MM月DD日）にも対応
+    if (!expiryCountdownEl) return;
     var raw = String(state.issued || "").trim();
-    var m = raw.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
-    if (!m) {
-      // 旧バージョンで発行日が保存されていない場合だけ、今回の初回表示日を保存
-      state.issued = todayLabel();
-      save(state);
-      raw = state.issued;
-      m = raw.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+    var m = raw.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})$/);
+    var issuedDate;
+    if (m) {
+      issuedDate = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    } else {
+      issuedDate = new Date();
     }
-    var issuedDate = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
     var expiryDate = new Date(issuedDate.getFullYear() + 1, issuedDate.getMonth(), issuedDate.getDate());
     var today = new Date();
     var todayDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    var remaining = Math.max(0, Math.ceil((expiryDate - todayDate) / 86400000));
-    expiryCountdownEl.innerHTML = '有効期限まであと <strong>' + remaining + '日</strong>';
+    var remaining = Math.max(0, Math.ceil((expiryDate.getTime() - todayDate.getTime()) / 86400000));
+    expiryCountdownEl.textContent = "有効期限まであと" + remaining + "日";
+    expiryCountdownEl.style.visibility = "visible";
+    expiryCountdownEl.style.opacity = "1";
   }
 
   function render() {
